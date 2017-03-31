@@ -1,6 +1,6 @@
 #pragma once
-#include "Task.h"
 #include "ISceneChanger.h"
+#include "Task.h"
 
 class Scene :
 	public Task
@@ -19,7 +19,7 @@ public:
 
 protected:
 	// 画像ハンドル格納用変数
-	int ImageHandle;
+	int Image;
 	// フォントハンドル
 	int Font;
 	// クラス所有元にシーン切り替えを伝えるインターフェイス

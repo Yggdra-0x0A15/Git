@@ -23,6 +23,7 @@
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Fps.cpp" />
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\Ini.cpp" />
     <ClCompile Include="src\ISceneChanger.cpp" />
     <ClCompile Include="src\Loading.cpp" />
     <ClCompile Include="src\Menu.cpp" />

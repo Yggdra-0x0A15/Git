@@ -7,11 +7,4 @@
 int WINAPI WinMain( HINSTANCE, HINSTANCE, LPSTR, int );
 // ‰Šú‰»
 int Init();
-// ini‰Šú‰»
-void InitializeINIFile(int* mode_p, int* width_p, int* height_p);
-// ini“Ç
-int ReadINIFile(int* mode_p, int* width_p, int* height_p);
-
-// FPSƒJƒEƒ“ƒ^
-long FpsCnt = 0;
 // End Of File

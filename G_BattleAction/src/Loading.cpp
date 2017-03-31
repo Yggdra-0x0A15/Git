@@ -10,7 +10,7 @@ void Loading::Initialize(){
 	int screenWidth;
 
 	// âÊëúÇÃÉçÅ[Éh
-	ImageHandle = LoadGraph("./dat/pic/Loading.bmp");
+	Image = LoadGraph("./dat/pic/Loading.bmp");
 	GetDrawScreenSize(&screenWidth, NULL);
 	Font = CreateFontToHandle("Segoe Print", static_cast<int>(static_cast<double>(screenWidth) / 1920.0 * 48), 9, DX_FONTTYPE_ANTIALIASING_EDGE);
 }
@@ -32,7 +32,7 @@ void Loading::Draw(){
 	Scene::Draw();
 	GetDrawScreenSize(&screenWidth, &screenHeight);
 	fontWidth = GetDrawStringWidthToHandle("Now Loading ...", sizeof("Now Loading ..."), Font);
-	DrawStringToHandle(screenWidth - fontWidth - 10, screenHeight - static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 65), "Now Loading ...", GetColor(255, 255, 255), Font);
+	DrawStringToHandle(screenWidth - fontWidth - static_cast<int>(static_cast<double>(screenWidth) / 1920.0 * 10), screenHeight - static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 65), "Now Loading ...", GetColor(255, 255, 255), Font);
 	DrawComplete = true;
 	DeleteFontToHandle(Font);
 }

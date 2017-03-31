@@ -1,9 +1,9 @@
+#include "SceneMgr.h"
 #include "DxLib.h"
 #include "Menu.h"
 #include "Loading.h"
 #include "Game.h"
 #include "Config.h"
-#include "SceneMgr.h"
 
 SceneMgr::SceneMgr() :
 	// Ÿ‚ÌƒV[ƒ“ŠÇ—•Ï”

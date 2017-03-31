@@ -7,7 +7,7 @@ Config::Config(ISceneChanger* changer) : Scene(changer) {
 // 初期化
 void Config::Initialize(){
 	// 画像のロード
-	ImageHandle = LoadGraph("./dat/pic/Loading.bmp");
+	Image = LoadGraph("./dat/pic/Loading.bmp");
 }
 
 // 更新

@@ -21,14 +21,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				break;
 			}
 		}
-		// FPS更新
-		fps.Update();
-		// 待機
-		fps.Wait();
 		// 更新
 		sceneMgr.Update();
 		// 描画
 		sceneMgr.Draw();
+		// FPS更新
+		fps.Update();
+		// 待機
+		fps.Wait();
 		// FPS描画
 		fps.Draw();
 	}
@@ -44,6 +44,7 @@ int Init(){
 
 	int retVal = 1;
 	HANDLE retCreate;
+	Ini ini;
 	int dispWidth;
 	int dispHeight;
 	int colorBit;
@@ -55,21 +56,22 @@ int Init(){
 	retCreate = CreateFile("./Config.ini", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if(retCreate != INVALID_HANDLE_VALUE){
 		CloseHandle(retCreate);
-		retVal = ReadINIFile(&Mode, &Width, &Height);
+		retVal = ini.Read();
 	}
 	else{
 		CloseHandle(retCreate);
-		InitializeINIFile(&Mode, &Width, &Height);
+		ini.Initialize();
+		retVal = ini.Read();
 	}
 	if(retVal == 1){
-		switch(Mode){
+		switch(ini.GetMode()){
 		case 1:
 			// ウィンドウモードに設定
 			ChangeWindowMode(TRUE);
 			GetDefaultState(&dispWidth, &dispHeight, &colorBit);
 			//// ウィンドウ設定
-			SetGraphMode(Width, Height, colorBit);
-			SetWindowInitPosition((dispWidth - Width) / 2, (dispHeight - Height) / 2);
+			SetGraphMode(ini.GetWidth(), ini.GetHeight(), colorBit);
+			SetWindowInitPosition((dispWidth - ini.GetWidth()) / 2, (dispHeight - ini.GetHeight()) / 2);
 			break;
 		case 2:
 			// 仮想フルスクリーンに設定
@@ -97,87 +99,6 @@ int Init(){
 		SetDrawScreen(DX_SCREEN_BACK);
 		// ユーザーが×ボタンを押しても自動的に終了しないようにする
 		SetWindowUserCloseEnableFlag(FALSE);
-	}
-	return retVal;
-}
-
-// iniファイル初期化
-void InitializeINIFile(int* mode_p, int* width_p, int* height_p){
-	HANDLE retCreate;
-	BOOL retWriteINI;
-	char errCode[23];
-	// ini書込
-	DeleteFile("./Config.ini");
-	retCreate = CreateFile("./Config.ini", GENERIC_ALL, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
-	CloseHandle(retCreate);
-	retWriteINI = WritePrivateProfileString("Window", "Mode", "1", "./Config.ini");
-	if(retWriteINI == FALSE){
-		sprintf_s(errCode, "ErrorCode = 0x%X", GetLastError());
-		MessageBox(GetMainWindowHandle(), _T(errCode), _T("Error!"), MB_OK);
-	}
-	retWriteINI = WritePrivateProfileString("Window", "Width", "1600", "./Config.ini");
-	if(retWriteINI == FALSE){
-		sprintf_s(errCode, "ErrorCode = 0x%X", GetLastError());
-		MessageBox(GetMainWindowHandle(), _T(errCode), _T("Error!"), MB_OK);
-	}
-	retWriteINI = WritePrivateProfileString("Window", "Height", "900", "./Config.ini");
-	if(retWriteINI == FALSE){
-		sprintf_s(errCode, "ErrorCode = 0x%X", GetLastError());
-		MessageBox(GetMainWindowHandle(), _T(errCode), _T("Error!"), MB_OK);
-	}
-	ReadINIFile(mode_p, width_p, height_p);
-}
-
-// ini読込
-int ReadINIFile(int* mode_p, int* width_p, int* height_p){
-	int retVal = 1;
-	DWORD retReadINI;
-	char mode[1 + 1];
-	char width[4 + 1];
-	char height[4 + 1];
-	bool breakflg = false;
-
-	// ウィンドウモードの取得
-	retReadINI = GetPrivateProfileString("Window", "Mode", "1", mode, sizeof(mode), "./Config.ini");
-	if(retReadINI < 1 && retVal == 1 && breakflg == false){
-		if(MessageBox(GetMainWindowHandle(), _T("Config.iniファイルが破損しています。\n初期化しますか？\nしない場合はアプリケーションを終了します。"), _T("確認"), MB_YESNO) == IDYES){
-			breakflg = true;
-		}
-		else{
-			retVal = 0;
-		}
-	}
-	else{
-		sscanf_s(mode, "%d", mode_p);
-	}
-	// ウィンドウ幅の取得
-	retReadINI = GetPrivateProfileString("Window", "Width", "1600", width, sizeof(width), "./Config.ini");
-	if(retReadINI < 2 && retVal == 1 && breakflg == false){
-		if(MessageBox(GetMainWindowHandle(), _T("Config.iniファイルが破損しています。\n初期化しますか？\nしない場合はアプリケーションを終了します。"), _T("確認"), MB_YESNO) == IDYES){
-			breakflg = true;
-		}
-		else{
-			retVal = 0;
-		}
-	}
-	else{
-		sscanf_s(width, "%d", width_p);
-	}
-	// ウィンドウ高の取得
-	retReadINI = GetPrivateProfileString("Window", "Height", "900", height, sizeof(height), "./Config.ini");
-	if(retReadINI < 2 && retVal == 1 && breakflg == false){
-		if(MessageBox(GetMainWindowHandle(), _T("Config.iniファイルが破損しています。\n初期化しますか？\nしない場合はアプリケーションを終了します。"), _T("確認"), MB_YESNO) == IDYES){
-			breakflg = true;
-		}
-		else{
-			retVal = 0;
-		}
-	}
-	else{
-		sscanf_s(height, "%d", height_p);
-	}
-	if(retVal == 1 && breakflg == true){
-		InitializeINIFile(mode_p, width_p, height_p);
 	}
 	return retVal;
 }
