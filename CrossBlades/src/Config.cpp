@@ -80,6 +80,7 @@ void Config::Draw(){
 		DrawStringToHandle(((screenWidth / 2 + screenWidth / 4) - fontWidth + screenWidth / 2) / 2, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 120), "Sound", GetColor(255, 255, 255), Font);
 		fontWidth = GetDrawStringWidthToHandle("Key Config", sizeof("Key Config"), Font);
 		DrawStringToHandle((screenWidth - fontWidth + screenWidth * 3 / 4) / 2, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 120), "Key Config", GetColor(255, 255, 255), Font);
+		// ディスプレイ関連設定
 		break;
 
 	case 1:
@@ -91,6 +92,7 @@ void Config::Draw(){
 		DrawStringToHandle(((screenWidth / 2 + screenWidth / 4) - fontWidth + screenWidth / 2) / 2, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 120), "Sound", GetColor(255, 255, 255), Font);
 		fontWidth = GetDrawStringWidthToHandle("Key Config", sizeof("Key Config"), Font);
 		DrawStringToHandle((screenWidth - fontWidth + screenWidth * 3 / 4) / 2, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 120), "Key Config", GetColor(255, 255, 255), Font);
+		// グラフィック関連設定
 		break;
 
 	case 2:
@@ -102,6 +104,7 @@ void Config::Draw(){
 		DrawStringToHandle(((screenWidth / 2 + screenWidth / 4) - fontWidth + screenWidth / 2) / 2, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 120), "Sound", GetColor(255, 255, 0), Font);
 		fontWidth = GetDrawStringWidthToHandle("Key Config", sizeof("Key Config"), Font);
 		DrawStringToHandle((screenWidth - fontWidth + screenWidth * 3 / 4) / 2, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 120), "Key Config", GetColor(255, 255, 255), Font);
+		// サウンド関連設定
 		break;
 
 	case 3:
@@ -113,6 +116,7 @@ void Config::Draw(){
 		DrawStringToHandle(((screenWidth / 2 + screenWidth / 4) - fontWidth + screenWidth / 2) / 2, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 120), "Sound", GetColor(255, 255, 255), Font);
 		fontWidth = GetDrawStringWidthToHandle("Key Config", sizeof("Key Config"), Font);
 		DrawStringToHandle((screenWidth - fontWidth + screenWidth * 3 / 4) / 2, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 120), "Key Config", GetColor(255, 255, 0), Font);
+		// キーコンフィグ関連設定
 		break;
 
 	default:
