@@ -22,6 +22,8 @@ protected:
 	int Image;
 	// フォントハンドル
 	int Font;
+	// フォントハンドル(日本語)
+	int FontJ;
 	// クラス所有元にシーン切り替えを伝えるインターフェイス
 	ISceneChanger* SceneChanger_p;
 

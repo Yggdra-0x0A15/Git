@@ -16,5 +16,7 @@ public:
 private:
 	unsigned short Cursor;
 	unsigned short Tab;
+	unsigned short Button;
+	bool TabStop;
 };
 // End Of File

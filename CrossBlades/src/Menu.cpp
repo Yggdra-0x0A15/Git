@@ -2,13 +2,8 @@
 #include "DxLib.h"
 
 Menu::Menu(ISceneChanger* changer) : Scene(changer){
-	int screenWidth;
-
 	// 画像のロード
 	Image = LoadGraph("./dat/pic/Menu.bmp");
-	// フォント作成
-	GetDrawScreenSize(&screenWidth, NULL);
-	Font = CreateFontToHandle("Segoe Print", static_cast<int>(static_cast<double>(screenWidth) / 1920.0 * 48), 9, DX_FONTTYPE_ANTIALIASING_EDGE);
 	Cursor = 0;
 }
 
