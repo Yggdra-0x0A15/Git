@@ -1,10 +1,11 @@
 #include "WinMain.h"
 #include "Fps.h"
-#include "Ini.h"
+#include "ini.h"
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	SceneMgr sceneMgr;
 	FPS fps;
+	Ini* ini_p = Ini::GetInstance();
 	// 初期化
 	if(Init() == 0) {
 		// 異常終了
@@ -27,8 +28,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		fps.Update();
 		// 待機
 		fps.Wait();
-		// FPS描画
-		fps.Draw();
+		if(ini_p->GetFps() == true){
+			// FPS描画
+			fps.Draw();
+		}
 	}
 	sceneMgr.Finalize();
 	// DXライブラリ終了処理
@@ -39,10 +42,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 // 初期化
 int Init(){
-
 	int retVal = 1;
 	HANDLE retCreate;
-	Ini ini;
+	Ini* ini_p = Ini::GetInstance();
 	int dispWidth;
 	int dispHeight;
 	int colorBit;
@@ -54,36 +56,41 @@ int Init(){
 	retCreate = CreateFile("./Config.ini", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if(retCreate != INVALID_HANDLE_VALUE){
 		CloseHandle(retCreate);
-		retVal = ini.Read();
+		retVal = ini_p->Read();
 	}
 	else{
 		CloseHandle(retCreate);
-		ini.Initialize();
-		retVal = ini.Read();
+		ini_p->Initialize();
+		retVal = ini_p->Read();
 	}
 	if(retVal == 1){
 		GetDefaultState(&dispWidth, &dispHeight, &colorBit);
-		switch(ini.GetMode()){
-		case 1:
+		switch(ini_p->GetMode()){
+		case 0:
 			// ウィンドウモードに設定
 			ChangeWindowMode(TRUE);
 			//// ウィンドウ設定
-			SetGraphMode(ini.GetWidth(), ini.GetHeight(), colorBit);
-			SetWindowInitPosition((dispWidth - ini.GetWidth()) / 2, (dispHeight - ini.GetHeight()) / 2);
+			SetGraphMode(ini_p->GetWidth(), ini_p->GetHeight(), colorBit);
+			SetWindowInitPosition((dispWidth - ini_p->GetWidth()) / 2, (dispHeight - ini_p->GetHeight()) / 2);
 			break;
-		case 2:
+
+		case 1:
 			// 仮想フルスクリーンに設定
 			ChangeWindowMode(TRUE);
 			SetWindowStyleMode(2);
 			SetGraphMode(dispWidth, dispHeight, colorBit);
 			SetWindowInitPosition(0, 0);
 			break;
-		case 3:
+
+		case 2:
 			// フルスクリーンに設定
 			break;
+
 		default:
 			break;
+
 		}
+		SetChangeScreenModeGraphicsSystemResetFlag(FALSE);
 		// DXライブラリ初期化処理
 		if(DxLib_Init() != 0) {
 			// 異常終了
@@ -96,6 +103,8 @@ int Init(){
 		SetDrawScreen(DX_SCREEN_BACK);
 		// ユーザーが×ボタンを押しても自動的に終了しないようにする
 		SetWindowUserCloseEnableFlag(FALSE);
+		// マウスカーソルを非表示に
+		SetMouseDispFlag(FALSE);
 	}
 	return retVal;
 }

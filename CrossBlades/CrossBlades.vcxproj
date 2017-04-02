@@ -123,6 +123,7 @@
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <TreatWarningAsError>false</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <StructMemberAlignment>4Bytes</StructMemberAlignment>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,6 +156,7 @@
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <TreatWarningAsError>false</TreatWarningAsError>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>4Bytes</StructMemberAlignment>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

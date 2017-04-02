@@ -2,12 +2,16 @@
 
 class Ini{
 public:
+	// インスタンス取得
+	static Ini* GetInstance();
 	// iniファイル初期化
 	void Initialize();
 	// ini読込
 	int Read();
+	// ini書込
+	void Write();
 	// ウィンドウモード取得
-	int GetMode();
+	unsigned short GetMode();
 	// ウィンドウモード設定
 	void SetMode(int mode);
 	// ウィンドウ幅取得
@@ -22,16 +26,23 @@ public:
 	int GetDisplay();
 	// 表示ディスプレイ設定
 	void SetDisplay(int display);
+	// FPS表示取得
+	bool GetFps();
+	// FPS表示設定
+	void SetFps(bool fps);
 
 private:
+	Ini(){}
 	// ウィンドウモード
-	int Mode;
+	unsigned short Mode;
 	// ウィンドウ幅
 	int Width;
 	// ウィンドウ高
 	int Height;
 	// 表示ディスプレイ
 	int Display;
+	// FPS表示
+	bool Fps;
 
 };
 // End Of File
