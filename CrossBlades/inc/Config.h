@@ -16,15 +16,29 @@ public:
 
 private:
 	Ini* Ini_p;
+	// ウィンドウモード
+	unsigned short Mode;
+	// ウィンドウ幅
+	int Width;
+	// ウィンドウ高
+	int Height;
+	// 表示ディスプレイ
+	int Display;
+	// FPS表示
+	bool Fps;
+
 	unsigned short Cursor;
 	unsigned short Tab;
 	unsigned short Button;
-	unsigned short IndexMode;
 	unsigned short IndexResolution;
 	unsigned short IndexDisplay;
 	bool TabStop;
 	bool Setting;
+	// 基本画面描画
+	void DrawBase(int screenWidth, int screenHeight);
 	// 設定適用
 	void ApplySetting();
+	// Ini設定
+	void SetIni();
 };
 // End Of File

@@ -84,13 +84,19 @@ int Init(){
 
 		case 2:
 			// フルスクリーンに設定
+			if(GetWindowModeFlag() == TRUE){
+				ChangeWindowMode(FALSE);
+			}
+			SetUseDirectDrawDeviceIndex(ini_p->GetDisplay());
+			SetFullScreenResolutionMode(DX_FSRESOLUTIONMODE_MAXIMUM);
+			SetGraphMode(ini_p->GetWidth(), ini_p->GetHeight(), colorBit);
+			break;
 			break;
 
 		default:
 			break;
 
 		}
-		SetChangeScreenModeGraphicsSystemResetFlag(FALSE);
 		// DXライブラリ初期化処理
 		if(DxLib_Init() != 0) {
 			// 異常終了
