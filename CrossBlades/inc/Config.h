@@ -16,20 +16,21 @@ public:
 
 private:
 	Ini* Ini_p;
-	// ウィンドウモード
-	unsigned short Mode;
-	// ウィンドウ幅
-	int Width;
-	// ウィンドウ高
-	int Height;
-	// 表示ディスプレイ
-	int Display;
-	// FPS表示
-	bool Fps;
+	// 変更前ウィンドウモード
+	unsigned short PreMode;
+	// 変更前ウィンドウ幅
+	int PreWidth;
+	// 変更前ウィンドウ高
+	int PreHeight;
+	// 変更前表示ディスプレイ
+	int PreDisplay;
+	// 変更前FPS表示
+	bool PreFps;
 
 	unsigned short Cursor;
 	unsigned short Tab;
 	unsigned short Button;
+	unsigned short IndexMode;
 	unsigned short IndexResolution;
 	unsigned short IndexDisplay;
 	bool TabStop;
@@ -38,7 +39,13 @@ private:
 	void DrawBase(int screenWidth, int screenHeight);
 	// 設定適用
 	void ApplySetting();
-	// Ini設定
-	void SetIni();
+	// キャンセル
+	void Cancel();
+	// 変更取得
+	bool GetChange();
+	// ウィンドウ変更取得
+	bool GetChangeWindow();
+
+	static bool Apply;
 };
 // End Of File

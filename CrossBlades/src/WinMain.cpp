@@ -15,9 +15,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	while(ScreenFlip() == 0 && ProcessMessage() == 0 && ClearDrawScreen() == 0) {
 		// 閉じるボタンダイアログ
 		if(GetWindowUserCloseFlag(TRUE)) {
+			SetMouseDispFlag(TRUE);
 			// 終了確認処理（「はい」が押されたら終了）
 			if(MessageBox(GetMainWindowHandle(), _T("終了しますか？"), _T("確認"), MB_YESNO) == IDYES) {
 				break;
+			}
+			else{
+				SetMouseDispFlag(FALSE);
 			}
 		}
 		// 更新
@@ -87,7 +91,7 @@ int Init(){
 			if(GetWindowModeFlag() == TRUE){
 				ChangeWindowMode(FALSE);
 			}
-			SetUseDirectDrawDeviceIndex(ini_p->GetDisplay());
+			SetUseDisplayIndex(ini_p->GetDisplay());
 			SetFullScreenResolutionMode(DX_FSRESOLUTIONMODE_MAXIMUM);
 			SetGraphMode(ini_p->GetWidth(), ini_p->GetHeight(), colorBit);
 			break;

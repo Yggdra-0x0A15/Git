@@ -1,40 +1,36 @@
 #include "Config.h"
 #include "DxLib.h"
 
+bool Config::Apply = false;
+
 Config::Config(ISceneChanger* changer) : Scene(changer) {
-	int x;
 	// iniインスタンス取得
 	Ini_p = Ini::GetInstance();
 	// 画像のロード
 	Image = LoadGraph("./dat/pic/Config.bmp");
-	Cursor = 0;
+	if(Apply == true){
+		Cursor = 4;
+	}
+	else{
+		Cursor = 0;
+	}
 	Tab = 0;
 	Button = 0;
 	TabStop = false;
 	Setting = false;
+	IndexMode = Ini_p->GetMode();
 	IndexResolution = 0;
 	IndexDisplay = 0;
-	// ウィンドウモード
-	if(GetWindowModeFlag() == TRUE){
-		GetWindowPosition(&x, NULL);
-		if(x != 0){
-			Mode = 0;
-		}
-		else{
-			Mode = 1;
-		}
-	}
-	else{
-		Mode = 2;
-	}
-	// ウィンドウ幅
-	Width = Ini_p->GetWidth();
-	// ウィンドウ高
-	Height = Ini_p->GetHeight();
-	// 表示ディスプレイ
-	Display = Ini_p->GetDisplay();
-	// FPS表示
-	Fps = Ini_p->GetFps();
+	// 変更前ウィンドウモード
+	PreMode = Ini_p->GetMode();
+	// 変更前ウィンドウ幅
+	PreWidth = Ini_p->GetWidth();
+	// 変更前ウィンドウ高
+	PreHeight = Ini_p->GetHeight();
+	// 変更前表示ディスプレイ
+	PreDisplay = Ini_p->GetDisplay();
+	// 変更前FPS表示
+	PreFps = Ini_p->GetFps();
 }
 
 // 初期化
@@ -56,6 +52,7 @@ void Config::Update(){
 				switch(Cursor){
 				case 0:
 					// ウィンドウモード
+					Ini_p->SetMode(IndexMode);
 					Setting = false;
 					break;
 
@@ -71,11 +68,11 @@ void Config::Update(){
 
 				case 3:
 					// FPS表示
-					if(Fps == true){
-						Fps = false;
+					if(Ini_p->GetFps() == true){
+						Ini_p->SetFps(false);
 					}
 					else{
-						Fps = true;
+						Ini_p->SetFps(true);
 					}
 					break;
 
@@ -123,11 +120,11 @@ void Config::Update(){
 
 				case 3:
 					// FPS表示
-					if(Fps == true){
-						Fps = false;
+					if(Ini_p->GetFps() == true){
+						Ini_p->SetFps(false);
 					}
 					else{
-						Fps = true;
+						Ini_p->SetFps(true);
 					}
 					break;
 
@@ -135,20 +132,27 @@ void Config::Update(){
 					switch(Button){
 					case 0:
 						// 保存
-						ApplySetting();
-						SetIni();
+						if(Apply == true){
+							Apply = false;
+						}
+						else{
+							ApplySetting();
+						}
 						Ini_p->Write();
 						SceneChanger_p->ChangeScene(SceneMenu);
 						break;
 
 					case 1:
 						// キャンセル
+						Cancel();
+						ApplySetting();
 						SceneChanger_p->ChangeScene(SceneMenu);
 						break;
 
 					case 2:
 						// 適用
 						ApplySetting();
+						Apply = true;
 						SceneChanger_p->ChangeScene(SceneConfig);
 						Scene::Finalize();
 						break;
@@ -186,11 +190,21 @@ void Config::Update(){
 		if(Setting == false){
 			if(TabStop == true){
 				// ボタン移動
-				if(Button == 0){
-					Button = 2;
+				if(GetChange() == true){
+					if(Button == 0){
+						Button = 2;
+					}
+					else{
+						Button--;
+					}
 				}
-				else{
-					Button--;
+				else if(Apply == true){
+					if(Button == 0){
+						Button = 1;
+					}
+					else{
+						Button--;
+					}
 				}
 			}
 			else{
@@ -209,11 +223,21 @@ void Config::Update(){
 		if(Setting == false){
 			if(TabStop == true){
 				// ボタン移動
-				if(Button == 2){
-					Button = 0;
+				if(GetChange() == true){
+					if(Button == 2){
+						Button = 0;
+					}
+					else{
+						Button++;
+					}
 				}
-				else{
-					Button++;
+				else if(Apply == true){
+					if(Button == 1){
+						Button = 0;
+					}
+					else{
+						Button++;
+					}
 				}
 			}
 			else{
@@ -237,11 +261,11 @@ void Config::Update(){
 				switch(Cursor){
 				case 0:
 					// ウィンドウモード
-					if(Mode == 0){
-						Mode = 2;
+					if(IndexMode == 0){
+						IndexMode = 2;
 					}
 					else{
-						Mode--;
+						IndexMode--;
 					}
 					break;
 
@@ -282,9 +306,22 @@ void Config::Update(){
 				Cursor = 4;
 			}
 			else{
-				Cursor--;
+				if(Ini_p->GetMode() == 0 && Cursor == 3){
+					Cursor = 1;
+				}
+				else if(Ini_p->GetMode() == 1 && Cursor == 3){
+					Cursor = 0;
+				}
+				else{
+					Cursor--;
+				}
 			}
-			Button = 0;
+			if(GetChange() == true){
+				Button = 0;
+			}
+			else{
+				Button = 1;
+			}
 		}
 	}
 	if(CheckHitKey(KEY_INPUT_DOWN) != 0){
@@ -295,11 +332,11 @@ void Config::Update(){
 				switch(Cursor){
 				case 0:
 					// ウィンドウモード
-					if(Mode == 2){
-						Mode = 0;
+					if(IndexMode == 2){
+						IndexMode = 0;
 					}
 					else{
-						Mode++;
+						IndexMode++;
 					}
 					break;
 
@@ -340,9 +377,22 @@ void Config::Update(){
 				Cursor = 0;
 			}
 			else{
-				Cursor++;
+				if(Ini_p->GetMode() == 0 && Cursor == 1){
+					Cursor = 3;
+				}
+				else if(Ini_p->GetMode() == 1 && Cursor == 0){
+					Cursor = 3;
+				}
+				else{
+					Cursor++;
+				}
 			}
-			Button = 0;
+			if(GetChange() == true){
+				Button = 0;
+			}
+			else{
+				Button = 1;
+			}
 		}
 	}
 }
@@ -378,7 +428,7 @@ void Config::Draw(){
 						, static_cast<float>(screenHeight / 1080.0 * 290)
 						, GetColor(255, 255, 255), FALSE);
 
-				switch(Mode){
+				switch(IndexMode){
 				case 0:
 					fontWidth = GetDrawStringWidthToHandle("ウィンドウ", sizeof("ウィンドウ"), FontJ);
 					DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
@@ -494,6 +544,13 @@ void Config::Draw(){
 				, static_cast<float>(screenWidth / 1920.0 * 1620)
 				, static_cast<float>(screenHeight / 1080.0 * 580)
 				, GetColor(255, 255, 0), FALSE);
+			if(Ini_p->GetFps() == true){
+				DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1595)
+					, static_cast<float>(screenHeight / 1080.0 * 555)
+					, static_cast<float>(screenWidth / 1920.0 * 1615)
+					, static_cast<float>(screenHeight / 1080.0 * 575)
+					, GetColor(255, 255, 0), TRUE);
+			}
 			TabStop = false;
 			break;
 
@@ -604,7 +661,7 @@ void Config::DrawBase(int screenWidth, int screenHeight){
 			, "▼", GetColor(255, 255, 255), FontJ);
 
 		if(Setting == false || Cursor != 0){
-			switch(Mode){
+			switch(Ini_p->GetMode()){
 			case 0:
 				fontWidth = GetDrawStringWidthToHandle("ウィンドウ", sizeof("ウィンドウ"), FontJ);
 				DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
@@ -632,39 +689,79 @@ void Config::DrawBase(int screenWidth, int screenHeight){
 			}
 		}
 		// 解像度
-		DrawStringToHandle(static_cast<int>(screenWidth / 1920.0 * 300), static_cast<int>(screenHeight / 1080.0 * 350), "解像度                :", GetColor(255, 255, 255), FontJ);
-		if(Setting == false || Cursor != 0){
-			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
+		if(Ini_p->GetMode() != 1){
+			DrawStringToHandle(static_cast<int>(screenWidth / 1920.0 * 300), static_cast<int>(screenHeight / 1080.0 * 350), "解像度                :", GetColor(255, 255, 255), FontJ);
+			if(Setting == false || Cursor != 0){
+				DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
+					, static_cast<float>(screenHeight / 1080.0 * 345)
+					, static_cast<float>(screenWidth / 1920.0 * 1580)
+					, static_cast<float>(screenHeight / 1080.0 * 390)
+					, GetColor(255, 255, 255), FALSE);
+			}
+			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
 				, static_cast<float>(screenHeight / 1080.0 * 345)
-				, static_cast<float>(screenWidth / 1920.0 * 1580)
+				, static_cast<float>(screenWidth / 1920.0 * 1620)
 				, static_cast<float>(screenHeight / 1080.0 * 390)
 				, GetColor(255, 255, 255), FALSE);
+			fontWidth = GetDrawStringWidthToHandle("▼", sizeof("▼"), FontJ);
+			DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1620 - (fontWidth + screenWidth / 1920.0 * 1580)) / 2 + screenWidth / 1920.0 * 1580)
+				, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+				, "▼", GetColor(255, 255, 255), FontJ);
 		}
-		DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
-			, static_cast<float>(screenHeight / 1080.0 * 345)
-			, static_cast<float>(screenWidth / 1920.0 * 1620)
-			, static_cast<float>(screenHeight / 1080.0 * 390)
-			, GetColor(255, 255, 255), FALSE);
-		fontWidth = GetDrawStringWidthToHandle("▼", sizeof("▼"), FontJ);
-		DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1620 - (fontWidth + screenWidth / 1920.0 * 1580)) / 2 + screenWidth / 1920.0 * 1580)
-			, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
-			, "▼", GetColor(255, 255, 255), FontJ);
+		else{
+			DrawStringToHandle(static_cast<int>(screenWidth / 1920.0 * 300), static_cast<int>(screenHeight / 1080.0 * 350), "解像度                :", GetColor(64, 64, 64), FontJ);
+			if(Setting == false || Cursor != 0){
+				DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
+					, static_cast<float>(screenHeight / 1080.0 * 345)
+					, static_cast<float>(screenWidth / 1920.0 * 1580)
+					, static_cast<float>(screenHeight / 1080.0 * 390)
+					, GetColor(64, 64, 64), FALSE);
+			}
+			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
+				, static_cast<float>(screenHeight / 1080.0 * 345)
+				, static_cast<float>(screenWidth / 1920.0 * 1620)
+				, static_cast<float>(screenHeight / 1080.0 * 390)
+				, GetColor(64, 64, 64), FALSE);
+			fontWidth = GetDrawStringWidthToHandle("▼", sizeof("▼"), FontJ);
+			DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1620 - (fontWidth + screenWidth / 1920.0 * 1580)) / 2 + screenWidth / 1920.0 * 1580)
+				, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+				, "▼", GetColor(64, 64, 64), FontJ);
+		}
 		// 表示ディスプレイ
-		DrawStringToHandle(static_cast<int>(screenWidth / 1920.0 * 300), static_cast<int>(screenHeight / 1080.0 * 450), "表示ディスプレイ :", GetColor(255, 255, 255), FontJ);
-		DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
-			, static_cast<float>(screenHeight / 1080.0 * 445)
-			, static_cast<float>(screenWidth / 1920.0 * 1580)
-			, static_cast<float>(screenHeight / 1080.0 * 490)
-			, GetColor(255, 255, 255), FALSE);
-		DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
-			, static_cast<float>(screenHeight / 1080.0 * 445)
-			, static_cast<float>(screenWidth / 1920.0 * 1620)
-			, static_cast<float>(screenHeight / 1080.0 * 490)
-			, GetColor(255, 255, 255), FALSE);
-		fontWidth = GetDrawStringWidthToHandle("▼", sizeof("▼"), FontJ);
-		DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1620 - (fontWidth + screenWidth / 1920.0 * 1580)) / 2 + screenWidth / 1920.0 * 1580)
-			, static_cast<int>(screenHeight / 1080.0 * 450)
-			, "▼", GetColor(255, 255, 255), FontJ);
+		if(Ini_p->GetMode() == 2){
+			DrawStringToHandle(static_cast<int>(screenWidth / 1920.0 * 300), static_cast<int>(screenHeight / 1080.0 * 450), "表示ディスプレイ :", GetColor(255, 255, 255), FontJ);
+			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
+				, static_cast<float>(screenHeight / 1080.0 * 445)
+				, static_cast<float>(screenWidth / 1920.0 * 1580)
+				, static_cast<float>(screenHeight / 1080.0 * 490)
+				, GetColor(255, 255, 255), FALSE);
+			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
+				, static_cast<float>(screenHeight / 1080.0 * 445)
+				, static_cast<float>(screenWidth / 1920.0 * 1620)
+				, static_cast<float>(screenHeight / 1080.0 * 490)
+				, GetColor(255, 255, 255), FALSE);
+			fontWidth = GetDrawStringWidthToHandle("▼", sizeof("▼"), FontJ);
+			DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1620 - (fontWidth + screenWidth / 1920.0 * 1580)) / 2 + screenWidth / 1920.0 * 1580)
+				, static_cast<int>(screenHeight / 1080.0 * 450)
+				, "▼", GetColor(255, 255, 255), FontJ);
+		}
+		else{
+			DrawStringToHandle(static_cast<int>(screenWidth / 1920.0 * 300), static_cast<int>(screenHeight / 1080.0 * 450), "表示ディスプレイ :", GetColor(64, 64, 64), FontJ);
+			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
+				, static_cast<float>(screenHeight / 1080.0 * 445)
+				, static_cast<float>(screenWidth / 1920.0 * 1580)
+				, static_cast<float>(screenHeight / 1080.0 * 490)
+				, GetColor(64, 64, 64), FALSE);
+			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
+				, static_cast<float>(screenHeight / 1080.0 * 445)
+				, static_cast<float>(screenWidth / 1920.0 * 1620)
+				, static_cast<float>(screenHeight / 1080.0 * 490)
+				, GetColor(64, 64, 64), FALSE);
+			fontWidth = GetDrawStringWidthToHandle("▼", sizeof("▼"), FontJ);
+			DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1620 - (fontWidth + screenWidth / 1920.0 * 1580)) / 2 + screenWidth / 1920.0 * 1580)
+				, static_cast<int>(screenHeight / 1080.0 * 450)
+				, "▼", GetColor(64, 64, 64), FontJ);
+		}
 		// FPS表示
 		DrawStringToHandle(static_cast<int>(screenWidth / 1920.0 * 300), static_cast<int>(screenHeight / 1080.0 * 550), "FPS表示             :", GetColor(255, 255, 255), FontJ);
 		DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1590)
@@ -672,6 +769,13 @@ void Config::DrawBase(int screenWidth, int screenHeight){
 			, static_cast<float>(screenWidth / 1920.0 * 1620)
 			, static_cast<float>(screenHeight / 1080.0 * 580)
 			, GetColor(255, 255, 255), FALSE);
+		if(Ini_p->GetFps() == true){
+			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1595)
+				, static_cast<float>(screenHeight / 1080.0 * 555)
+				, static_cast<float>(screenWidth / 1920.0 * 1615)
+				, static_cast<float>(screenHeight / 1080.0 * 575)
+				, GetColor(255, 255, 255), TRUE);
+		}
 		break;
 
 	case 1:
@@ -689,15 +793,29 @@ void Config::DrawBase(int screenWidth, int screenHeight){
 	default:
 		break;
 	}
-	DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1330), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 980), static_cast<float>(screenWidth / 1920.0 * 1480), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 1050), GetColor(255, 255, 255), FALSE);
-	fontWidth = GetDrawStringWidthToHandle("保存", sizeof("保存"), FontJ);
-	DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1480 - (fontWidth + screenWidth / 1920.0 * 1330)) / 2 + screenWidth / 1920.0 * 1330), static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 999), "保存", GetColor(255, 255, 255), FontJ);
+	if(GetChange() == true || Apply == true){
+		DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1330), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 980), static_cast<float>(screenWidth / 1920.0 * 1480), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 1050), GetColor(255, 255, 255), FALSE);
+		fontWidth = GetDrawStringWidthToHandle("保存", sizeof("保存"), FontJ);
+		DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1480 - (fontWidth + screenWidth / 1920.0 * 1330)) / 2 + screenWidth / 1920.0 * 1330), static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 999), "保存", GetColor(255, 255, 255), FontJ);
+	}
+	else{
+		DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1330), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 980), static_cast<float>(screenWidth / 1920.0 * 1480), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 1050), GetColor(64, 64, 64), FALSE);
+		fontWidth = GetDrawStringWidthToHandle("保存", sizeof("保存"), FontJ);
+		DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1480 - (fontWidth + screenWidth / 1920.0 * 1330)) / 2 + screenWidth / 1920.0 * 1330), static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 999), "保存", GetColor(64, 64, 64), FontJ);
+	}
 	DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1530), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 980), static_cast<float>(screenWidth / 1920.0 * 1680), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 1050), GetColor(255, 255, 255), FALSE);
 	fontWidth = GetDrawStringWidthToHandle("ｷｬﾝｾﾙ", sizeof("ｷｬﾝｾﾙ"), FontJ);
 	DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1680 - (fontWidth + screenWidth / 1920.0 * 1530)) / 2 + screenWidth / 1920.0 * 1530), static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 999), "ｷｬﾝｾﾙ", GetColor(255, 255, 255), FontJ);
-	DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1730), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 980), static_cast<float>(screenWidth / 1920.0 * 1880), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 1050), GetColor(255, 255, 255), FALSE);
-	fontWidth = GetDrawStringWidthToHandle("適用", sizeof("適用"), FontJ);
-	DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1880 - (fontWidth + screenWidth / 1920.0 * 1730)) / 2 + screenWidth / 1920.0 * 1730), static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 999), "適用", GetColor(255, 255, 255), FontJ);
+	if(GetChange() == true){
+		DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1730), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 980), static_cast<float>(screenWidth / 1920.0 * 1880), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 1050), GetColor(255, 255, 255), FALSE);
+		fontWidth = GetDrawStringWidthToHandle("適用", sizeof("適用"), FontJ);
+		DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1880 - (fontWidth + screenWidth / 1920.0 * 1730)) / 2 + screenWidth / 1920.0 * 1730), static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 999), "適用", GetColor(255, 255, 255), FontJ);
+	}
+	else{
+		DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1730), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 980), static_cast<float>(screenWidth / 1920.0 * 1880), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 1050), GetColor(64, 64, 64), FALSE);
+		fontWidth = GetDrawStringWidthToHandle("適用", sizeof("適用"), FontJ);
+		DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1880 - (fontWidth + screenWidth / 1920.0 * 1730)) / 2 + screenWidth / 1920.0 * 1730), static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 999), "適用", GetColor(64, 64, 64), FontJ);
+	}
 }
 
 // 設定適用
@@ -706,58 +824,112 @@ void Config::ApplySetting(){
 	int dispHeight;
 	int colorBit;
 
-	GetDefaultState(&dispWidth, &dispHeight, &colorBit);
-	// ウィンドウモード設定
-	switch(Mode){
-	case 0:
-		// ウィンドウモードに設定
-		SetWindowVisibleFlag(FALSE);
-		if(GetWindowModeFlag() == FALSE){
-			ChangeWindowMode(TRUE);
+	if(GetChangeWindow() == true){
+		GetDefaultState(&dispWidth, &dispHeight, &colorBit);
+		// ウィンドウモード設定
+		switch(Ini_p->GetMode()){
+		case 0:
+			// ウィンドウモードに設定
+			SetWindowVisibleFlag(FALSE);
+			if(GetWindowModeFlag() == FALSE){
+				ChangeWindowMode(TRUE);
+			}
+			SetWindowStyleMode(0);
+			// ウィンドウ設定
+			SetGraphMode(Ini_p->GetWidth(), Ini_p->GetHeight(), colorBit);
+			SetWindowVisibleFlag(TRUE);
+			SetWindowPosition((dispWidth - Ini_p->GetWidth()) / 2, (dispHeight - Ini_p->GetHeight()) / 2);
+			break;
+
+		case 1:
+			// 仮想フルスクリーンに設定
+			SetWindowVisibleFlag(FALSE);
+			if(GetWindowModeFlag() == FALSE){
+				ChangeWindowMode(TRUE);
+			}
+			SetWindowStyleMode(2);
+			SetWindowPosition(0, 0);
+			SetGraphMode(dispWidth, dispHeight, colorBit);
+			SetWindowVisibleFlag(TRUE);
+			break;
+
+		case 2:
+			// フルスクリーンに設定
+			SetWindowVisibleFlag(FALSE);
+			if(GetWindowModeFlag() == TRUE){
+				ChangeWindowMode(FALSE);
+			}
+			SetUseDisplayIndex(Ini_p->GetDisplay());
+			SetFullScreenResolutionMode(DX_FSRESOLUTIONMODE_MAXIMUM);
+			SetGraphMode(Ini_p->GetWidth(), Ini_p->GetHeight(), colorBit);
+			SetWindowVisibleFlag(TRUE);
+			break;
+
+		default:
+			break;
+
 		}
-		SetWindowStyleMode(0);
-		// ウィンドウ設定
-		SetGraphMode(Width, Height, colorBit);
-		SetWindowPosition((dispWidth - Width) / 2, (dispHeight - Height) / 2);
-		SetWindowVisibleFlag(TRUE);
-		break;
-
-	case 1:
-		// 仮想フルスクリーンに設定
-		SetWindowVisibleFlag(FALSE);
-		if(GetWindowModeFlag() == FALSE){
-			ChangeWindowMode(TRUE);
-		}
-		SetWindowStyleMode(2);
-		SetWindowPosition(0, 0);
-		SetGraphMode(dispWidth, dispHeight, colorBit);
-		SetWindowVisibleFlag(TRUE);
-		break;
-
-	case 2:
-		// フルスクリーンに設定
-		SetWindowVisibleFlag(FALSE);
-		if(GetWindowModeFlag() == TRUE){
-			ChangeWindowMode(FALSE);
-		}
-		SetUseDirectDrawDeviceIndex(Display);
-		SetFullScreenResolutionMode(DX_FSRESOLUTIONMODE_MAXIMUM);
-		SetGraphMode(Ini_p->GetWidth(), Ini_p->GetHeight(), colorBit);
-		SetWindowVisibleFlag(TRUE);
-		break;
-
-	default:
-		break;
-
 	}
-	// マウスカーソルを非表示に
-	SetMouseDispFlag(FALSE);
 }
-void Config::SetIni(){
-	Ini_p->SetMode(Mode);
-	Ini_p->SetWidth(Width);
-	Ini_p->SetHeight(Height);
-	Ini_p->SetDisplay(Display);
-	Ini_p->SetFps(Fps);
+
+// キャンセル
+void Config::Cancel(){
+	Ini_p->SetMode(PreMode);
+	Ini_p->SetWidth(PreWidth);
+	Ini_p->SetHeight(PreHeight);
+	Ini_p->SetDisplay(PreDisplay);
+	Ini_p->SetFps(PreFps);
+}
+
+// 変更取得
+bool Config::GetChange(){
+	bool retVal = false;
+
+	// 変更前ウィンドウモード
+	if(PreMode != Ini_p->GetMode()){
+		retVal = true;
+	}
+	// 変更前ウィンドウ幅
+	if(PreWidth != Ini_p->GetWidth()){
+		retVal = true;
+	}
+	// 変更前ウィンドウ高
+	if(PreHeight != Ini_p->GetHeight()){
+		retVal = true;
+	}
+	// 変更前表示ディスプレイ
+	if(PreDisplay != Ini_p->GetDisplay()){
+		retVal = true;
+	}
+	// 変更前FPS表示
+	if(PreFps != Ini_p->GetFps()){
+		retVal = true;
+	}
+
+	return retVal;
+}
+
+// ウィンドウ変更取得
+bool Config::GetChangeWindow(){
+	bool retVal = false;
+
+	// 変更前ウィンドウモード
+	if(PreMode != Ini_p->GetMode()){
+		retVal = true;
+	}
+	// 変更前ウィンドウ幅
+	if(PreWidth != Ini_p->GetWidth()){
+		retVal = true;
+	}
+	// 変更前ウィンドウ高
+	if(PreHeight != Ini_p->GetHeight()){
+		retVal = true;
+	}
+	// 変更前表示ディスプレイ
+	if(PreDisplay != Ini_p->GetDisplay()){
+		retVal = true;
+	}
+
+	return retVal;
 }
 // End Of File
