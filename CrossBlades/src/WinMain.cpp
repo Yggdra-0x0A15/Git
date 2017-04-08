@@ -51,7 +51,6 @@ int Init(){
 	Ini* ini_p = Ini::GetInstance();
 	int dispWidth;
 	int dispHeight;
-	int colorBit;
 
 	// ウィンドウ描画停止
 	SetWindowVisibleFlag(FALSE);
@@ -68,13 +67,18 @@ int Init(){
 		retVal = ini_p->Read();
 	}
 	if(retVal == 1){
-		GetDefaultState(&dispWidth, &dispHeight, &colorBit);
+		SetFullScreenResolutionMode(DX_FSRESOLUTIONMODE_NATIVE);
+		SetFullScreenScalingMode(DX_FSSCALINGMODE_BILINEAR);
+		ini_p->SetNumDisplay(GetDirectDrawDeviceNum());
+		//GetDefaultState(NULL, NULL, &colorBit);
+		dispWidth = GetSystemMetrics(SM_CXSCREEN);
+		dispHeight = GetSystemMetrics(SM_CYSCREEN);
 		switch(ini_p->GetMode()){
 		case 0:
 			// ウィンドウモードに設定
 			ChangeWindowMode(TRUE);
 			//// ウィンドウ設定
-			SetGraphMode(ini_p->GetWidth(), ini_p->GetHeight(), colorBit);
+			SetGraphMode(ini_p->GetWidth(), ini_p->GetHeight(), 32);
 			SetWindowInitPosition((dispWidth - ini_p->GetWidth()) / 2, (dispHeight - ini_p->GetHeight()) / 2);
 			break;
 
@@ -82,19 +86,17 @@ int Init(){
 			// 仮想フルスクリーンに設定
 			ChangeWindowMode(TRUE);
 			SetWindowStyleMode(2);
-			SetGraphMode(dispWidth, dispHeight, colorBit);
+			SetGraphMode(dispWidth, dispHeight, 32);
 			SetWindowInitPosition(0, 0);
 			break;
 
 		case 2:
 			// フルスクリーンに設定
+			SetGraphMode(ini_p->GetWidth(), ini_p->GetHeight(), 32);
+			SetUseDirectDrawDeviceIndex(ini_p->GetDisplay());
 			if(GetWindowModeFlag() == TRUE){
 				ChangeWindowMode(FALSE);
 			}
-			SetUseDisplayIndex(ini_p->GetDisplay());
-			SetFullScreenResolutionMode(DX_FSRESOLUTIONMODE_MAXIMUM);
-			SetGraphMode(ini_p->GetWidth(), ini_p->GetHeight(), colorBit);
-			break;
 			break;
 
 		default:

@@ -105,7 +105,7 @@ int Ini::Read(){
 		sscanf_s(height, "%d", &Height);
 	}
 	// 表示ディスプレイの取得
-	retRead = GetPrivateProfileString("Window", "Height", "0", display, sizeof(display), "./Config.ini");
+	retRead = GetPrivateProfileString("Window", "Display", "0", display, sizeof(display), "./Config.ini");
 	if(retRead < 1 && retVal == 1 && fileBreak == false){
 		if(MessageBox(GetMainWindowHandle(), _T("Config.iniファイルが破損しています。\n初期化しますか？\nしない場合はアプリケーションを終了します。"), _T("確認"), MB_YESNO) == IDYES){
 			fileBreak = true;
@@ -201,6 +201,16 @@ void Ini::SetHeight(int height){
 	Height = height;
 }
 
+// ウィンドウ高取得
+unsigned short Ini::GetNumResolution(){
+	return NumResolution;
+}
+
+// ウィンドウ高設定
+void Ini::SetNumResolution(unsigned short numResolution){
+	NumResolution = numResolution;
+}
+
 // 表示ディスプレイ取得
 int Ini::GetDisplay(){
 	return Display;
@@ -209,6 +219,16 @@ int Ini::GetDisplay(){
 // 表示ディスプレイ設定
 void Ini::SetDisplay(int display){
 	Display = display;
+}
+
+// ディスプレイ数取得
+unsigned short Ini::GetNumDisplay(){
+	return NumDisplay;
+}
+
+// ディスプレイ数設定
+void Ini::SetNumDisplay(unsigned short numDisplay){
+	NumDisplay = numDisplay;
 }
 
 // FPS表示取得

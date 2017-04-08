@@ -20,7 +20,7 @@ bool FPS::Update(){
 	if(Count == N){
 		// •½‹Ï‚ðŒvŽZ‚·‚é
 		int t = GetNowCount();
-		Fps = 1000.f / ((t - StartTime) / (float)N);
+		Fps = 1000.f / ((t - StartTime) / static_cast<float>(N));
 		Count = 0;
 		StartTime = t;
 	}

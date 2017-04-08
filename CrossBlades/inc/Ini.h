@@ -22,10 +22,18 @@ public:
 	int GetHeight();
 	// ウィンドウ高設定
 	void SetHeight(int height);
+	// 解像度数取得
+	unsigned short GetNumResolution();
+	// 解像度数設定
+	void SetNumResolution(unsigned short numResolution);
 	// 表示ディスプレイ取得
 	int GetDisplay();
 	// 表示ディスプレイ設定
 	void SetDisplay(int display);
+	// 表示ディスプレイ取得
+	unsigned short GetNumDisplay();
+	// 表示ディスプレイ設定
+	void SetNumDisplay(unsigned short numDisplay);
 	// FPS表示取得
 	bool GetFps();
 	// FPS表示設定
@@ -39,8 +47,12 @@ private:
 	int Width;
 	// ウィンドウ高
 	int Height;
+	// 解像度数
+	unsigned short NumResolution;
 	// 表示ディスプレイ
 	int Display;
+	// ディスプレイ数
+	unsigned short NumDisplay;
 	// FPS表示
 	bool Fps;
 

@@ -19,8 +19,36 @@ Config::Config(ISceneChanger* changer) : Scene(changer) {
 	TabStop = false;
 	Setting = false;
 	IndexMode = Ini_p->GetMode();
-	IndexResolution = 0;
-	IndexDisplay = 0;
+	switch(Ini_p->GetWidth()){
+	case 800:
+		IndexResolution = 0;
+		break;
+
+	case 1280:
+		IndexResolution = 1;
+		break;
+
+	case 1600:
+		IndexResolution = 2;
+		break;
+
+	case 1920:
+		IndexResolution = 3;
+		break;
+
+	case 2880:
+		IndexResolution = 4;
+		break;
+
+	case 3840:
+		IndexResolution = 5;
+		break;
+
+	default:
+		break;
+
+	}
+	IndexDisplay = Ini_p->GetDisplay();
 	// ïœçXëOÉEÉBÉìÉhÉEÉÇÅ[Éh
 	PreMode = Ini_p->GetMode();
 	// ïœçXëOÉEÉBÉìÉhÉEïù
@@ -58,11 +86,47 @@ void Config::Update(){
 
 				case 1:
 					// âëúìx
+					switch(IndexResolution){
+					case 0:
+						Ini_p->SetWidth(800);
+						Ini_p->SetHeight(450);
+						break;
+
+					case 1:
+						Ini_p->SetWidth(1280);
+						Ini_p->SetHeight(720);
+						break;
+
+					case 2:
+						Ini_p->SetWidth(1600);
+						Ini_p->SetHeight(900);
+						break;
+
+					case 3:
+						Ini_p->SetWidth(1920);
+						Ini_p->SetHeight(1080);
+						break;
+
+					case 4:
+						Ini_p->SetWidth(2880);
+						Ini_p->SetHeight(1620);
+						break;
+
+					case 5:
+						Ini_p->SetWidth(3840);
+						Ini_p->SetHeight(2160);
+						break;
+
+					default:
+						break;
+
+					}
 					Setting = false;
 					break;
 
 				case 2:
 					// ï\é¶ÉfÉBÉXÉvÉåÉC
+					Ini_p->SetDisplay(IndexDisplay);
 					Setting = false;
 					break;
 
@@ -271,10 +335,22 @@ void Config::Update(){
 
 				case 1:
 					// âëúìx
+					if(IndexResolution == 0){
+						IndexResolution = Ini_p->GetNumResolution() - 1;
+					}
+					else{
+						IndexResolution--;
+					}
 					break;
 
 				case 2:
 					// ï\é¶ÉfÉBÉXÉvÉåÉC
+					if(IndexDisplay == 0){
+						IndexDisplay = Ini_p->GetNumDisplay() - 1;
+					}
+					else{
+						IndexDisplay--;
+					}
 					break;
 
 				default:
@@ -302,19 +378,40 @@ void Config::Update(){
 		}
 		else{
 			// ÉJÅ[É\Éãà⁄ìÆ
-			if(Cursor == 0){
-				Cursor = 4;
-			}
-			else{
-				if(Ini_p->GetMode() == 0 && Cursor == 3){
-					Cursor = 1;
-				}
-				else if(Ini_p->GetMode() == 1 && Cursor == 3){
-					Cursor = 0;
+			switch(Tab){
+			case 0:
+				// ÉfÉBÉXÉvÉåÉCê›íË
+				if(Cursor == 0){
+					Cursor = 4;
 				}
 				else{
-					Cursor--;
+					if(Ini_p->GetMode() == 0 && Cursor == 3){
+						Cursor = 1;
+					}
+					else if(Ini_p->GetMode() == 1 && Cursor == 3){
+						Cursor = 0;
+					}
+					else{
+						Cursor--;
+					}
 				}
+				if(Cursor == 4){
+					TabStop = true;
+				}
+				else{
+					TabStop = false;
+				}
+				break;
+
+			case 1:
+				break;
+
+			case 2:
+				break;
+
+			case 3:
+				break;
+
 			}
 			if(GetChange() == true){
 				Button = 0;
@@ -342,10 +439,22 @@ void Config::Update(){
 
 				case 1:
 					// âëúìx
+					if(IndexResolution == Ini_p->GetNumResolution() - 1){
+						IndexResolution = 0;
+					}
+					else{
+						IndexResolution++;
+					}
 					break;
 
 				case 2:
 					// ï\é¶ÉfÉBÉXÉvÉåÉC
+					if(IndexDisplay == Ini_p->GetNumDisplay() - 1){
+						IndexDisplay = 0;
+					}
+					else{
+						IndexDisplay++;
+					}
 					break;
 
 				default:
@@ -373,19 +482,43 @@ void Config::Update(){
 		}
 		else{
 			// ÉJÅ[É\Éãà⁄ìÆ
-			if(Cursor == 4){
-				Cursor = 0;
-			}
-			else{
-				if(Ini_p->GetMode() == 0 && Cursor == 1){
-					Cursor = 3;
-				}
-				else if(Ini_p->GetMode() == 1 && Cursor == 0){
-					Cursor = 3;
+			switch(Tab){
+			case 0:
+				// ÉfÉBÉXÉvÉåÉCê›íË
+				if(Cursor == 4){
+					Cursor = 0;
 				}
 				else{
-					Cursor++;
+					if(Ini_p->GetMode() == 0 && Cursor == 1){
+						Cursor = 3;
+					}
+					else if(Ini_p->GetMode() == 1 && Cursor == 0){
+						Cursor = 3;
+					}
+					else{
+						Cursor++;
+					}
 				}
+				if(Cursor == 4){
+					TabStop = true;
+				}
+				else{
+					TabStop = false;
+				}
+				break;
+
+			case 1:
+				break;
+
+			case 2:
+				break;
+
+			case 3:
+				break;
+
+			default:
+				break;
+
 			}
 			if(GetChange() == true){
 				Button = 0;
@@ -402,6 +535,7 @@ void Config::Draw(){
 	int fontWidth;
 	int screenWidth;
 	int screenHeight;
+
 	// êeÉNÉâÉXÇÃï`âÊÉÅÉ\ÉbÉhÇåƒÇ‘
 	Scene::Draw();
 	GetWindowSize(&screenWidth, &screenHeight);
@@ -495,45 +629,178 @@ void Config::Draw(){
 								, static_cast<int>(screenHeight / 1080.0 * 250)
 								, "Å•", GetColor(255, 255, 0), FontJ);
 			}
-			TabStop = false;
 			break;
 
 		case 1:
 			// âëúìx
 			DrawStringToHandle(static_cast<int>(screenWidth / 1920.0 * 300), static_cast<int>(screenHeight / 1080.0 * 350), "âëúìx                :", GetColor(255, 255, 0), FontJ);
-			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
+			if(Setting == true){
+				unsigned short num = 0;
+				int dispWidth = 0;
+				GetDefaultState(&dispWidth, NULL, NULL);
+				if(dispWidth >= 800){
+					if(IndexResolution == num){
+						fontWidth = GetDrawStringWidthToHandle("800 Å~ 450", sizeof("800 Å~ 450"), FontJ);
+						DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+							, static_cast<int>(screenHeight / 1080.0 * (350 + num * 50))
+							, "800 Å~ 450", GetColor(255, 255, 0), FontJ);
+					}
+					else{
+						fontWidth = GetDrawStringWidthToHandle("800 Å~ 450", sizeof("800 Å~ 450"), FontJ);
+						DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+							, static_cast<int>(screenHeight / 1080.0 * (350 + num * 50))
+							, "800 Å~ 450", GetColor(255, 255, 255), FontJ);
+					}
+					num++;
+					if(dispWidth >= 1280){
+						if(IndexResolution == num){
+							fontWidth = GetDrawStringWidthToHandle("1280 Å~ 720", sizeof("1280 Å~ 720"), FontJ);
+							DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+								, static_cast<int>(screenHeight / 1080.0 * (350 + num * 50))
+								, "1280 Å~ 720", GetColor(255, 255, 0), FontJ);
+						}
+						else{
+							fontWidth = GetDrawStringWidthToHandle("1280 Å~ 720", sizeof("1280 Å~ 720"), FontJ);
+							DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+								, static_cast<int>(screenHeight / 1080.0 * (350 + num * 50))
+								, "1280 Å~ 720", GetColor(255, 255, 255), FontJ);
+						}
+						num++;
+						if(dispWidth >= 1600){
+							if(IndexResolution == num){
+								fontWidth = GetDrawStringWidthToHandle("1600 Å~ 900", sizeof("1600 Å~ 900"), FontJ);
+								DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+									, static_cast<int>(screenHeight / 1080.0 * (350 + num * 50))
+									, "1600 Å~ 900", GetColor(255, 255, 0), FontJ);
+							}
+							else{
+								fontWidth = GetDrawStringWidthToHandle("1600 Å~ 900", sizeof("1600 Å~ 900"), FontJ);
+								DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+									, static_cast<int>(screenHeight / 1080.0 * (350 + num * 50))
+									, "1600 Å~ 900", GetColor(255, 255, 255), FontJ);
+							}
+							num++;
+							if(dispWidth >= 1920){
+								if(IndexResolution == num){
+									fontWidth = GetDrawStringWidthToHandle("1920 Å~ 1080", sizeof("1920 Å~ 1080"), FontJ);
+									DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+										, static_cast<int>(screenHeight / 1080.0 * (350 + num * 50))
+										, "1920 Å~ 1080", GetColor(255, 255, 0), FontJ);
+								}
+								else{
+									fontWidth = GetDrawStringWidthToHandle("1920 Å~ 1080", sizeof("1920 Å~ 1080"), FontJ);
+									DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+										, static_cast<int>(screenHeight / 1080.0 * (350 + num * 50))
+										, "1920 Å~ 1080", GetColor(255, 255, 255), FontJ);
+								}
+								num++;
+								if(dispWidth >= 2880){
+									if(IndexResolution == num){
+										fontWidth = GetDrawStringWidthToHandle("2880 Å~ 1620", sizeof("2880 Å~ 1620"), FontJ);
+										DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+											, static_cast<int>(screenHeight / 1080.0 * (350 + num * 50))
+											, "2880 Å~ 1620", GetColor(255, 255, 0), FontJ);
+									}
+									else{
+										fontWidth = GetDrawStringWidthToHandle("2880 Å~ 1620", sizeof("2880 Å~ 1620"), FontJ);
+										DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+											, static_cast<int>(screenHeight / 1080.0 * (350 + num * 50))
+											, "2880 Å~ 1620", GetColor(255, 255, 255), FontJ);
+									}
+									num++;
+									if(dispWidth >= 3840){
+										if(IndexResolution == num){
+											fontWidth = GetDrawStringWidthToHandle("3840 Å~ 2160", sizeof("3840 Å~ 2160"), FontJ);
+											DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+												, static_cast<int>(screenHeight / 1080.0 * (350 + num * 50))
+												, "2880 Å~ 1620", GetColor(255, 255, 0), FontJ);
+										}
+										else{
+											fontWidth = GetDrawStringWidthToHandle("3840 Å~ 2160", sizeof("3840 Å~ 2160"), FontJ);
+											DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+												, static_cast<int>(screenHeight / 1080.0 * (350 + num * 50))
+												, "3840 Å~ 2160", GetColor(255, 255, 255), FontJ);
+										}
+										num++;
+									}
+								}
+							}
+						}
+					}
+				}
+				// ÉRÉìÉ{É{ÉbÉNÉXägí£
+				DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
 					, static_cast<float>(screenHeight / 1080.0 * 345)
 					, static_cast<float>(screenWidth / 1920.0 * 1580)
-					, static_cast<float>(screenHeight / 1080.0 * 390)
-					, GetColor(255, 255, 0), FALSE);
-			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
-					, static_cast<float>(screenHeight / 1080.0 * 345)
-					, static_cast<float>(screenWidth / 1920.0 * 1620)
-					, static_cast<float>(screenHeight / 1080.0 * 390)
-					, GetColor(255, 255, 0), FALSE);
-			fontWidth = GetDrawStringWidthToHandle("Å•", sizeof("Å•"), FontJ);
-			DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1620 - (fontWidth + screenWidth / 1920.0 * 1580)) / 2 + screenWidth / 1920.0 * 1580)
-							, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
-							, "Å•", GetColor(255, 255, 0), FontJ);
+					, static_cast<float>(screenHeight / 1080.0 * (345 + num * 50 - 5))
+					, GetColor(255, 255, 255), FALSE);
+				Ini_p->SetNumResolution(num);
+			}
+			else{
+				DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
+						, static_cast<float>(screenHeight / 1080.0 * 345)
+						, static_cast<float>(screenWidth / 1920.0 * 1580)
+						, static_cast<float>(screenHeight / 1080.0 * 390)
+						, GetColor(255, 255, 0), FALSE);
+				DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
+						, static_cast<float>(screenHeight / 1080.0 * 345)
+						, static_cast<float>(screenWidth / 1920.0 * 1620)
+						, static_cast<float>(screenHeight / 1080.0 * 390)
+						, GetColor(255, 255, 0), FALSE);
+				fontWidth = GetDrawStringWidthToHandle("Å•", sizeof("Å•"), FontJ);
+				DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1620 - (fontWidth + screenWidth / 1920.0 * 1580)) / 2 + screenWidth / 1920.0 * 1580)
+								, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+								, "Å•", GetColor(255, 255, 0), FontJ);
+			}
 			break;
 
 		case 2:
 			DrawStringToHandle(static_cast<int>(screenWidth / 1920.0 * 300), static_cast<int>(screenHeight / 1080.0 * 450), "ï\é¶ÉfÉBÉXÉvÉåÉC :", GetColor(255, 255, 0), FontJ);
-			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
-				, static_cast<float>(screenHeight / 1080.0 * 445)
-				, static_cast<float>(screenWidth / 1920.0 * 1580)
-				, static_cast<float>(screenHeight / 1080.0 * 490)
-				, GetColor(255, 255, 0), FALSE);
-			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
-				, static_cast<float>(screenHeight / 1080.0 * 445)
-				, static_cast<float>(screenWidth / 1920.0 * 1620)
-				, static_cast<float>(screenHeight / 1080.0 * 490)
-				, GetColor(255, 255, 0), FALSE);
-			fontWidth = GetDrawStringWidthToHandle("Å•", sizeof("Å•"), FontJ);
-			DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1620 - (fontWidth + screenWidth / 1920.0 * 1580)) / 2 + screenWidth / 1920.0 * 1580)
-				, static_cast<int>(screenHeight / 1080.0 * 450)
-				, "Å•", GetColor(255, 255, 0), FontJ);
-			TabStop = false;
+			if(Setting == true){
+				DISPLAY_DEVICE dd;
+				// ÉRÉìÉ{É{ÉbÉNÉXägí£
+				DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
+					, static_cast<float>(screenHeight / 1080.0 * 445)
+					, static_cast<float>(screenWidth / 1920.0 * 1580)
+					, static_cast<float>(screenHeight / 1080.0 * (445 + Ini_p->GetNumDisplay() * 50 - 5))
+					, GetColor(255, 255, 255), FALSE);
+				for(unsigned short i = 0; i < Ini_p->GetNumDisplay(); i++){
+					memset(&dd, 0x00, sizeof(dd));
+					dd.cb = sizeof(dd);
+					dd.StateFlags = DISPLAY_DEVICE_ATTACHED;
+					EnumDisplayDevices(NULL, i, &dd, false);
+					if(i == IndexDisplay){
+						fontWidth = GetDrawStringWidthToHandle(dd.DeviceName, sizeof(dd.DeviceName), FontJ);
+						DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+							, static_cast<int>(screenHeight / 1080.0 * (450 + i * 50))
+							, dd.DeviceName, GetColor(255, 255, 0), FontJ);
+					}
+					else{
+						fontWidth = GetDrawStringWidthToHandle(dd.DeviceName, sizeof(dd.DeviceName), FontJ);
+						DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+							, static_cast<int>(screenHeight / 1080.0 * (450 + i * 50))
+							, dd.DeviceName, GetColor(255, 255, 255), FontJ);
+					}
+				}
+
+			}
+			else{
+				DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
+					, static_cast<float>(screenHeight / 1080.0 * 445)
+					, static_cast<float>(screenWidth / 1920.0 * 1580)
+					, static_cast<float>(screenHeight / 1080.0 * 490)
+					, GetColor(255, 255, 0), FALSE);
+				DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
+					, static_cast<float>(screenHeight / 1080.0 * 445)
+					, static_cast<float>(screenWidth / 1920.0 * 1620)
+					, static_cast<float>(screenHeight / 1080.0 * 490)
+					, GetColor(255, 255, 0), FALSE);
+				fontWidth = GetDrawStringWidthToHandle("Å•", sizeof("Å•"), FontJ);
+				DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1620 - (fontWidth + screenWidth / 1920.0 * 1580)) / 2 + screenWidth / 1920.0 * 1580)
+					, static_cast<int>(screenHeight / 1080.0 * 450)
+					, "Å•", GetColor(255, 255, 0), FontJ);
+
+			}
 			break;
 
 		case 3:
@@ -551,11 +818,9 @@ void Config::Draw(){
 					, static_cast<float>(screenHeight / 1080.0 * 575)
 					, GetColor(255, 255, 0), TRUE);
 			}
-			TabStop = false;
 			break;
 
 		case 4:
-			TabStop = true;
 			switch(Button){
 			case 0:
 				DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1330), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 980), static_cast<float>(screenWidth / 1920.0 * 1480), static_cast<float>(static_cast<double>(screenHeight) / 1080.0 * 1050), GetColor(255, 255, 0), FALSE);
@@ -613,6 +878,7 @@ void Config::Draw(){
 // äÓñ{âÊñ ï`âÊ
 void Config::DrawBase(int screenWidth, int screenHeight){
 	int fontWidth;
+	DISPLAY_DEVICE dd;
 
 	DrawLineAA(0.0f
 		, static_cast<float>(screenHeight / 1080.0 * 100)
@@ -691,12 +957,59 @@ void Config::DrawBase(int screenWidth, int screenHeight){
 		// âëúìx
 		if(Ini_p->GetMode() != 1){
 			DrawStringToHandle(static_cast<int>(screenWidth / 1920.0 * 300), static_cast<int>(screenHeight / 1080.0 * 350), "âëúìx                :", GetColor(255, 255, 255), FontJ);
-			if(Setting == false || Cursor != 0){
+			if((Setting == false || Cursor != 0) && (Setting == false || Cursor != 1)){
 				DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
 					, static_cast<float>(screenHeight / 1080.0 * 345)
 					, static_cast<float>(screenWidth / 1920.0 * 1580)
 					, static_cast<float>(screenHeight / 1080.0 * 390)
 					, GetColor(255, 255, 255), FALSE);
+				switch(IndexResolution){
+				case 0:
+					fontWidth = GetDrawStringWidthToHandle("800 Å~ 450", sizeof("800 Å~ 450"), FontJ);
+					DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+						, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+						, "800 Å~ 450", GetColor(255, 255, 255), FontJ);
+					break;
+
+				case 1:
+					fontWidth = GetDrawStringWidthToHandle("1280 Å~ 720", sizeof("1280 Å~ 720"), FontJ);
+					DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+						, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+						, "1280 Å~ 720", GetColor(255, 255, 255), FontJ);
+					break;
+
+				case 2:
+					fontWidth = GetDrawStringWidthToHandle("1600 Å~ 900", sizeof("1600 Å~ 900"), FontJ);
+					DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+						, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+						, "1600 Å~ 900", GetColor(255, 255, 255), FontJ);
+					break;
+
+				case 3:
+					fontWidth = GetDrawStringWidthToHandle("1920 Å~ 1080", sizeof("1920 Å~ 1080"), FontJ);
+					DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+						, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+						, "1920 Å~ 1080", GetColor(255, 255, 255), FontJ);
+					break;
+
+				case 4:
+					fontWidth = GetDrawStringWidthToHandle("2880 Å~ 1620", sizeof("2880 Å~ 1620"), FontJ);
+					DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+						, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+						, "2880 Å~ 1620", GetColor(255, 255, 255), FontJ);
+					break;
+
+				case 5:
+					fontWidth = GetDrawStringWidthToHandle("3840 Å~ 2160", sizeof("3840 Å~ 2160"), FontJ);
+					DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+						, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+						, "3840 Å~ 2160", GetColor(255, 255, 255), FontJ);
+					break;
+
+				default:
+					break;
+
+				}
 			}
 			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
 				, static_cast<float>(screenHeight / 1080.0 * 345)
@@ -716,6 +1029,53 @@ void Config::DrawBase(int screenWidth, int screenHeight){
 					, static_cast<float>(screenWidth / 1920.0 * 1580)
 					, static_cast<float>(screenHeight / 1080.0 * 390)
 					, GetColor(64, 64, 64), FALSE);
+				switch(IndexResolution){
+				case 0:
+					fontWidth = GetDrawStringWidthToHandle("800 Å~ 450", sizeof("800 Å~ 450"), FontJ);
+					DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+						, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+						, "800 Å~ 450", GetColor(64, 64, 64), FontJ);
+					break;
+
+				case 1:
+					fontWidth = GetDrawStringWidthToHandle("1280 Å~ 720", sizeof("1280 Å~ 720"), FontJ);
+					DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+						, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+						, "1280 Å~ 720", GetColor(64, 64, 64), FontJ);
+					break;
+
+				case 2:
+					fontWidth = GetDrawStringWidthToHandle("1600 Å~ 900", sizeof("1600 Å~ 900"), FontJ);
+					DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+						, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+						, "1600 Å~ 900", GetColor(64, 64, 64), FontJ);
+					break;
+
+				case 3:
+					fontWidth = GetDrawStringWidthToHandle("1920 Å~ 1080", sizeof("1920 Å~ 1080"), FontJ);
+					DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+						, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+						, "1920 Å~ 1080", GetColor(64, 64, 64), FontJ);
+					break;
+
+				case 4:
+					fontWidth = GetDrawStringWidthToHandle("2880 Å~ 1620", sizeof("2880 Å~ 1620"), FontJ);
+					DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+						, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+						, "2880 Å~ 1620", GetColor(64, 64, 64), FontJ);
+					break;
+
+				case 5:
+					fontWidth = GetDrawStringWidthToHandle("3840 Å~ 2160", sizeof("3840 Å~ 2160"), FontJ);
+					DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+						, static_cast<int>(static_cast<double>(screenHeight) / 1080.0 * 350)
+						, "3840 Å~ 2160", GetColor(64, 64, 64), FontJ);
+					break;
+
+				default:
+					break;
+
+				}
 			}
 			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
 				, static_cast<float>(screenHeight / 1080.0 * 345)
@@ -728,13 +1088,23 @@ void Config::DrawBase(int screenWidth, int screenHeight){
 				, "Å•", GetColor(64, 64, 64), FontJ);
 		}
 		// ï\é¶ÉfÉBÉXÉvÉåÉC
+		memset(&dd, 0x00, sizeof(dd));
+		dd.cb = sizeof(dd);
+		dd.StateFlags = DISPLAY_DEVICE_ACTIVE;
+		EnumDisplayDevices(NULL, Ini_p->GetDisplay(), &dd, false);
 		if(Ini_p->GetMode() == 2){
 			DrawStringToHandle(static_cast<int>(screenWidth / 1920.0 * 300), static_cast<int>(screenHeight / 1080.0 * 450), "ï\é¶ÉfÉBÉXÉvÉåÉC :", GetColor(255, 255, 255), FontJ);
-			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
-				, static_cast<float>(screenHeight / 1080.0 * 445)
-				, static_cast<float>(screenWidth / 1920.0 * 1580)
-				, static_cast<float>(screenHeight / 1080.0 * 490)
-				, GetColor(255, 255, 255), FALSE);
+			if((Setting == false || Cursor != 2) && (Setting == false || Cursor != 1)){
+				DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
+					, static_cast<float>(screenHeight / 1080.0 * 445)
+					, static_cast<float>(screenWidth / 1920.0 * 1580)
+					, static_cast<float>(screenHeight / 1080.0 * 490)
+					, GetColor(255, 255, 255), FALSE);
+				fontWidth = GetDrawStringWidthToHandle(dd.DeviceName, sizeof(dd.DeviceName), FontJ);
+				DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+					, static_cast<int>(screenHeight / 1080.0 * 450)
+					, dd.DeviceName, GetColor(255, 255, 255), FontJ);
+			}
 			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
 				, static_cast<float>(screenHeight / 1080.0 * 445)
 				, static_cast<float>(screenWidth / 1920.0 * 1620)
@@ -747,11 +1117,17 @@ void Config::DrawBase(int screenWidth, int screenHeight){
 		}
 		else{
 			DrawStringToHandle(static_cast<int>(screenWidth / 1920.0 * 300), static_cast<int>(screenHeight / 1080.0 * 450), "ï\é¶ÉfÉBÉXÉvÉåÉC :", GetColor(64, 64, 64), FontJ);
-			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
-				, static_cast<float>(screenHeight / 1080.0 * 445)
-				, static_cast<float>(screenWidth / 1920.0 * 1580)
-				, static_cast<float>(screenHeight / 1080.0 * 490)
-				, GetColor(64, 64, 64), FALSE);
+			if(Setting == false || Cursor != 1){
+				DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1200)
+					, static_cast<float>(screenHeight / 1080.0 * 445)
+					, static_cast<float>(screenWidth / 1920.0 * 1580)
+					, static_cast<float>(screenHeight / 1080.0 * 490)
+					, GetColor(64, 64, 64), FALSE);
+				fontWidth = GetDrawStringWidthToHandle(dd.DeviceName, sizeof(dd.DeviceName), FontJ);
+				DrawStringToHandle(static_cast<int>((screenWidth / 1920.0 * 1580 - (fontWidth + screenWidth / 1920.0 * 1200)) / 2 + screenWidth / 1920.0 * 1200)
+					, static_cast<int>(screenHeight / 1080.0 * 450)
+					, dd.DeviceName, GetColor(64, 64, 64), FontJ);
+			}
 			DrawBoxAA(static_cast<float>(screenWidth / 1920.0 * 1580)
 				, static_cast<float>(screenHeight / 1080.0 * 445)
 				, static_cast<float>(screenWidth / 1920.0 * 1620)
@@ -788,6 +1164,7 @@ void Config::DrawBase(int screenWidth, int screenHeight){
 
 	case 3:
 		// ÉLÅ[ÉRÉìÉtÉBÉO
+		DrawStringToHandle(static_cast<int>(screenWidth / 1920.0 * 300), static_cast<int>(screenHeight / 1080.0 * 250), "égópÉfÉoÉCÉX :", GetColor(255, 255, 255), FontJ);
 		break;
 
 	default:
@@ -822,10 +1199,10 @@ void Config::DrawBase(int screenWidth, int screenHeight){
 void Config::ApplySetting(){
 	int dispWidth;
 	int dispHeight;
-	int colorBit;
 
 	if(GetChangeWindow() == true){
-		GetDefaultState(&dispWidth, &dispHeight, &colorBit);
+		dispWidth = GetSystemMetrics(SM_CXSCREEN);
+		dispHeight = GetSystemMetrics(SM_CYSCREEN);
 		// ÉEÉBÉìÉhÉEÉÇÅ[Éhê›íË
 		switch(Ini_p->GetMode()){
 		case 0:
@@ -836,9 +1213,9 @@ void Config::ApplySetting(){
 			}
 			SetWindowStyleMode(0);
 			// ÉEÉBÉìÉhÉEê›íË
-			SetGraphMode(Ini_p->GetWidth(), Ini_p->GetHeight(), colorBit);
-			SetWindowVisibleFlag(TRUE);
+			SetGraphMode(Ini_p->GetWidth(), Ini_p->GetHeight(), 32);
 			SetWindowPosition((dispWidth - Ini_p->GetWidth()) / 2, (dispHeight - Ini_p->GetHeight()) / 2);
+			SetWindowVisibleFlag(TRUE);
 			break;
 
 		case 1:
@@ -848,20 +1225,19 @@ void Config::ApplySetting(){
 				ChangeWindowMode(TRUE);
 			}
 			SetWindowStyleMode(2);
+			SetGraphMode(dispWidth, dispHeight, 32);
 			SetWindowPosition(0, 0);
-			SetGraphMode(dispWidth, dispHeight, colorBit);
 			SetWindowVisibleFlag(TRUE);
 			break;
 
 		case 2:
 			// ÉtÉãÉXÉNÉäÅ[ÉìÇ…ê›íË
 			SetWindowVisibleFlag(FALSE);
+			SetGraphMode(Ini_p->GetWidth(), Ini_p->GetHeight(), 32);
+			SetUseDirectDrawDeviceIndex(Ini_p->GetDisplay());
 			if(GetWindowModeFlag() == TRUE){
 				ChangeWindowMode(FALSE);
 			}
-			SetUseDisplayIndex(Ini_p->GetDisplay());
-			SetFullScreenResolutionMode(DX_FSRESOLUTIONMODE_MAXIMUM);
-			SetGraphMode(Ini_p->GetWidth(), Ini_p->GetHeight(), colorBit);
 			SetWindowVisibleFlag(TRUE);
 			break;
 
